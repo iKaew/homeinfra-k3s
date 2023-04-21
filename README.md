@@ -4,6 +4,7 @@ Home infra on raspberry pi with k3s
 ## Prerequisite
 - Install minimal Raspberry Pi OS
 - Setup hostname, ip address and dns
+ - use /etc/network/interfaces and /etc/hosts
 
 ## Installation
 - Run pi-setup.sh for docker & k3s installation and hardening
@@ -22,3 +23,6 @@ To reset admin password
 ```
 kubectl exec -it $(kubectl get pod -n dns -l app=pihole -o name) -- pihole -a -p
 ```
+
+
+:warning: Please note that any kubectl command should be run under `app` user
