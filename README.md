@@ -12,6 +12,11 @@ Home infra on raspberry pi with k3s
   * SSH to raspberry pi
   * `sudo su - app`
   * `kubectl apply -f dns.yaml`
+- Deploy Home Assistant
+  * SSH to raspberry pi
+  * `sudo su - app`
+  * `kubectl apply -f homeassistant.yaml`
+  
 
 ## Pihole admin password
 To see admin password after first deployment
