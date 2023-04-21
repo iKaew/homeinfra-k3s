@@ -4,7 +4,7 @@ Home infra on raspberry pi with k3s
 ## Prerequisite
 - Install minimal Raspberry Pi OS
 - Setup hostname, ip address and dns
- - use /etc/network/interfaces and /etc/hosts
+  - use /etc/network/interfaces and /etc/hosts
 
 ## Installation
 - Run pi-setup.sh for docker & k3s installation and hardening
