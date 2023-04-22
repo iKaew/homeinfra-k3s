@@ -92,7 +92,10 @@ spec:
       restartPolicy: Always
       hostNetwork: true
       terminationGracePeriodSeconds: 30
-      dnsPolicy: ClusterFirst
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 192.168.1.2
       securityContext: {}
       schedulerName: default-scheduler
   strategy:
