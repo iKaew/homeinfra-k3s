@@ -1,3 +1,10 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: tunnel
+  labels:
+    name: tunnel
+
 ---
 apiVersion: apps/v1
 kind: Deployment
