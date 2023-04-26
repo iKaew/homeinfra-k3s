@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: cloudflared
-        image: cloudflare/cloudflared:latest
+        image: hellopeera/cloudflared:latest
         imagePullPolicy: Always
         args:
         - tunnel
