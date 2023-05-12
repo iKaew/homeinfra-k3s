@@ -73,12 +73,12 @@ spec:
             - containerPort: 6789
           volumeMounts:
             - mountPath: /config
-              name: unifi
+              name: unifi-data-vol
       restartPolicy: Always
       volumes:
-        - name: unifi
+        - name: unifi-data-vol
           persistentVolumeClaim:
-            claimName: unifi
+            claimName: unifi-data-pvc
 
 ---
 apiVersion: v1
