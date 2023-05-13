@@ -105,7 +105,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: unifi-controller
+  name: unifi-lb-tcp
   namespace: unifi
 spec:
   type: LoadBalancer
@@ -116,10 +116,6 @@ spec:
       port: 8080
       protocol: TCP
       targetPort: 8080
-    - name: stun
-      port: 3478
-      protocol: UDP
-      targetPort: 3478
     - name: default-console
       port: 8443
       protocol: TCP
@@ -136,6 +132,22 @@ spec:
       port: 6789
       protocol: TCP
       targetPort: 6789
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unifi-lb-udp
+  namespace: unifi
+spec:
+  type: LoadBalancer
+  selector:
+    app: unifi-controller 
+  ports:
+    - name: stun
+      port: 3478
+      protocol: UDP
+      targetPort: 3478
     - name: unifi-disc
       port: 10001
       protocol: UDP
