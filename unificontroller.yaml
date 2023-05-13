@@ -115,7 +115,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: unifi-controller 
+    name: unifi-controller
   ports:
     - name: device-comm
       port: 8080
@@ -147,7 +147,7 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: unifi-controller 
+    name: unifi-controller
   ports:
     - name: stun
       port: 3478
