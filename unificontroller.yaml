@@ -73,7 +73,7 @@ spec:
               value: "1000"
             - name: PUID
               value: "1000"
-          image: jacobalberty/unifi:v7.5
+          image: jacobalberty/unifi:v7.4
           name: unifi-controller
           ports:
             - containerPort: 3478
