@@ -221,7 +221,7 @@ chown root:docker /usr/local/bin/docker-compose
 
 # Install k3s
 node_ip=$(ip -br address | grep eth0 | egrep -o '[0-9\.]+/' | cut -d/ -f1)
-curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.1+k3s1 sh -s - server \
+curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.28.2+k3s1 sh -s - server \
   --node-name ${node_ip} \
   --node-external-ip ${node_ip} \
   --cluster-cidr 192.168.128.0/18 \
