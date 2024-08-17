@@ -72,7 +72,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: go2rtc-data-vol
-              mountPath: /etc/go2rtc-data
+              mountPath: /config
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           imagePullPolicy: Always
