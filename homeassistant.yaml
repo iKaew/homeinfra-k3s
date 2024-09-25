@@ -79,6 +79,14 @@ spec:
             - name: http
               containerPort: 8123
               protocol: TCP
+            - name: mdns
+              containerPort: 5353            # mDNS discovery port
+              hostPort: 5353                 # Map to host port 5353
+              protocol: UDP                  # mDNS uses UDP
+            - name: upnp
+              containerPort: 1900            # UPnP discovery port
+              hostPort: 1900                 # Map to host port 1900
+              protocol: UDP                 
           volumeMounts:
             - name: homeassistant-config-vol
               mountPath: /config
@@ -90,7 +98,7 @@ spec:
           securityContext:
             privileged: true
       restartPolicy: Always
-      hostNetwork: true
+      # hostNetwork: true
       terminationGracePeriodSeconds: 30
       dnsPolicy: None
       dnsConfig:
@@ -106,25 +114,5 @@ spec:
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600    
 
----
 
-kind: Service
-apiVersion: v1
-metadata:
-  name: homeassistant
-  namespace: homeassistant
-  labels:
-    app: homeassistant
-    kubernetes.io/name: homeassistant
-spec:
-  ports:
-    - name: homeassistant
-      protocol: TCP
-      port: 8123
-      targetPort: 8123
-      nodePort: 30438
-  selector:
-    app: homeassistant
-  type: NodePort
-  sessionAffinity: None
   
