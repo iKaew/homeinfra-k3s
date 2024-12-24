@@ -10,6 +10,6 @@ spec:
         spec:
           containers:
           - name: prepull
-            image: home-assistant:stable
+            image: 'homeassistant/home-assistant:stable'
             command: ["true"]
           restartPolicy: Never
