@@ -54,7 +54,8 @@ metadata:
   labels:
     app: homeassistant
 spec:
-  replicas: 1
+  replicas: 1  
+  revisionHistoryLimit: 0
   selector:
     matchLabels:
       app: homeassistant
