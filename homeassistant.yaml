@@ -80,9 +80,10 @@ spec:
               protocol: TCP
             - name: mdns
               containerPort: 5353            # mDNS discovery port
-              #hostPort: 5353                 # Map to host port 5353 protocol: UDP                  # mDNS uses UDP
+              hostPort: 5353                 # Map to host port 5353 protocol: UDP                  # mDNS uses UDP
             - name: upnp
-              containerPort: 1900            # UPnP discovery port #hostPort: 1900                 # Map to host port 1900
+              containerPort: 1900            # UPnP discovery port #
+              hostPort: 1900                 # Map to host port 1900
               protocol: UDP                 
           volumeMounts:
             - name: homeassistant-config-vol
@@ -113,39 +114,4 @@ spec:
 
 
 
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: homeassistant-service
-  namespace: homeassistant
-spec:
-  selector:
-    app: homeassistant
-  ports:
-    - port: 8123
-      protocol: TCP
-  type: LoadBalancer
-  
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: homeassistant-network-service
-  namespace: homeassistant
-spec:
-  selector:
-    app: homeassistant
-  ports:
-    - name: mdns
-      port: 5353
-      protocol: UDP
-    - name: upnp
-      port: 1900
-      protocol: UDP
-  type: LoadBalancer  
-  externalTrafficPolicy: Local
-  loadBalancerIP: 192.168.1.2
 ---
