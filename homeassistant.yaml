@@ -121,6 +121,7 @@ spec:
     - name: http
       port: 8123
       protocol: TCP
+      targetPort: 8123
   type: LoadBalancer
   
 ---
@@ -136,8 +137,10 @@ spec:
     - name: mdns
       port: 5353
       protocol: UDP
+      targetPort: 5353
     - name: upnp
       port: 1900
       protocol: UDP
+      targetPort: 1900
   type: LoadBalancer  
 ---
