@@ -133,32 +133,19 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: homeassistant-mdns-service
+  name: homeassistant-network-service
   namespace: homeassistant
 spec:
   selector:
     app: homeassistant
   ports:
-    - port: 5353
+    - name: mdns
+      port: 5353
+      protocol: UDP
+    - name: upnp
+      port: 1900
       protocol: UDP
   type: LoadBalancer  
   externalTrafficPolicy: Local
 
 ---
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: homeassistant-upnp-service
-  namespace: homeassistant
-spec:
-  selector:
-    app: homeassistant
-  ports:
-    - port: 1900
-      protocol: UDP
-  type: LoadBalancer  
-  externalTrafficPolicy: Local
-
----
-  
