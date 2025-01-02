@@ -60,7 +60,6 @@ spec:
       app: homeassistant
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: homeassistant
     spec:
@@ -81,11 +80,9 @@ spec:
               protocol: TCP
             - name: mdns
               containerPort: 5353            # mDNS discovery port
-              #hostPort: 5353                 # Map to host port 5353
-              protocol: UDP                  # mDNS uses UDP
+              #hostPort: 5353                 # Map to host port 5353 protocol: UDP                  # mDNS uses UDP
             - name: upnp
-              containerPort: 1900            # UPnP discovery port
-              #hostPort: 1900                 # Map to host port 1900
+              containerPort: 1900            # UPnP discovery port #hostPort: 1900                 # Map to host port 1900
               protocol: UDP                 
           volumeMounts:
             - name: homeassistant-config-vol
@@ -109,8 +106,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
+      maxSurge: 2
+      maxUnavailable: 1
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600    
 
