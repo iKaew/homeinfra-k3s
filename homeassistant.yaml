@@ -76,14 +76,11 @@ spec:
           image: 'homeassistant/home-assistant:stable'
           resources:
           ports:
-            - name: http
-              containerPort: 8123
+            - containerPort: 8123
               protocol: TCP
-            - name: mdns
-              containerPort: 5353            # mDNS discovery port
+            - containerPort: 5353            # mDNS discovery port
               protocol: UDP 
-            - name: upnp
-              containerPort: 1900            # UPnP discovery port #             
+            - containerPort: 1900            # UPnP discovery port #             
               protocol: UDP                 
           volumeMounts:
             - name: homeassistant-config-vol
