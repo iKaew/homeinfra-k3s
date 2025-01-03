@@ -160,9 +160,9 @@ spec:
             - containerPort: 53
               protocol: UDP
           volumeMounts:
-            - name: config-vol
+            - name: config-nfs-vol
               mountPath: /etc/pihole
-            - name: dnsmasq-vol
+            - name: dnsmasq-nfs-vol
               mountPath: /etc/dnsmasq.d
           env:
             - name: PIHOLE_DNS_
@@ -194,12 +194,14 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 10
       volumes:
-        - name: config-vol
-          persistentVolumeClaim:
-            claimName: pihole-config-pvc
-        - name: dnsmasq-vol
-          persistentVolumeClaim:
-            claimName: pihole-dnsmasq-pvc
+        - name: config-nfs-vol
+          nfs:
+            server: 192.168.1.114
+            path: /volume2/home-infra/pihole/config
+        - name: dnsmasq-nfs-vol
+          nfs:
+            server: 192.168.1.114
+            path: /volume2/home-infra/pihole/dnsmasq
 
 ---
 
