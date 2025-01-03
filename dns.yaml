@@ -167,6 +167,14 @@ spec:
           env:
             - name: PIHOLE_DNS_
               value: $(CLOUDFLARED_SERVICE_SERVICE_HOST)#$(CLOUDFLARED_SERVICE_SERVICE_PORT)
+            - name: FTLCONF_LOCAL_IPV4
+              value: 192.168.1.3    # need revisit when move to a multinode cluster
+            - name: DNSMASQ_USER
+              value: root
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
           startupProbe:
             httpGet:
               path: /admin/
