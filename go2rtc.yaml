@@ -51,9 +51,10 @@ spec:
         app: go2rtc
     spec:
       volumes:
-        - name: go2rtc-data-vol
-          persistentVolumeClaim:
-            claimName: go2rtc-data-pvc
+        - name: go2rtc-nfs-config-vol
+          nfs:
+            server: 192.168.1.114
+            path: /volume2/home-infra/go2rtc/config
       containers:
         - name: go2rtc
           image: 'alexxit/go2rtc'
@@ -65,13 +66,14 @@ spec:
             - name: rtsp
               containerPort: 8554
               protocol: TCP
-            - name: webrtc
+            - name: webrtc-tcp
               containerPort: 8555
               protocol: TCP
+            - name: webrtc-udp
               containerPort: 8555
-              protocol: TCP
+              protocol: UDP
           volumeMounts:
-            - name: go2rtc-data-vol
+            - name: go2rtc-nfs-config-vol
               mountPath: /config
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
