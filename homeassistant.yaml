@@ -51,9 +51,10 @@ spec:
         app: homeassistant
     spec:
       volumes:
-        - name: homeassistant-config-vol
-          persistentVolumeClaim:
-            claimName: homeassistant-config-pvc
+        - name: homeassistant-nfs-config-vol
+          nfs:
+            server: 192.168.1.114
+            path: /volume2/home-infra/homeassistant/config
       containers:
         - name: homeassistant
           image: 'homeassistant/home-assistant:stable'
