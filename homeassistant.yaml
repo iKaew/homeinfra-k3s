@@ -67,7 +67,7 @@ spec:
             - containerPort: 1900            # UPnP discovery port #             
               protocol: UDP                 
           volumeMounts:
-            - name: homeassistant-config-vol
+            - name: homeassistant-nfs-config-vol
               mountPath: /config
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
