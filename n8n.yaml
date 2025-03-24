@@ -55,9 +55,7 @@ spec:
             - name: N8N_PROTOCOL
               value: "http"
             - name: N8N_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
+              value: "n8n.local"
             - name: N8N_BASIC_AUTH_ACTIVE
               value: "true"
             - name: N8N_BASIC_AUTH_USER
