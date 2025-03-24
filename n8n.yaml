@@ -15,7 +15,7 @@ spec:
   resources:
     requests:
       storage: 5Gi  # Adjust based on your needs
-
+  storageClassName: local-path
 ---
 apiVersion: v1
 kind: Secret
@@ -67,6 +67,8 @@ spec:
                 secretKeyRef:
                   name: n8n-secrets
                   key: N8N_ENCRYPTION_KEY
+            - name: N8N_SECURE_COOKIE 
+              value: "false"
           volumeMounts:
             - name: n8n-data
               mountPath: /home/node/.n8n  # SQLite database storage
