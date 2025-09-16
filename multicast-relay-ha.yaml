@@ -18,16 +18,16 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: multicast-relay
-          image: ghcr.io/alsmith/multicast-relay:latest
+          image: scyto/multicast-relay:latest
           imagePullPolicy: IfNotPresent
           securityContext:
             capabilities:
               add: ["NET_ADMIN", "NET_RAW"]
           args:
             - "-i"
-            - "eth0"              # LAN interface (adjust if not eth0)
+            - "eth0"              # LAN interface (change if your NIC isn't eth0)
             - "-i"
-            - "cni0"              # pod network
+            - "cni0"              # k3s pod network
             - "-g"
             - "224.0.0.251"       # mDNS
             - "-g"
