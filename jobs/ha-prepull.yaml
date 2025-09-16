@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ha-image-prepull
+  namespace: homeassistant
+spec:
+  schedule: "0 3 * * *"   # every night at 03:00
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: image-prepull
+              image: homeassistant/home-assistant:stable
+              command: ["echo", "Pre-pulled Home Assistant image"]
+              # ^ runs instantly, just pulls image into cache
