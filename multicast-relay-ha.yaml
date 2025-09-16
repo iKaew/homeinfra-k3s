@@ -23,9 +23,10 @@ spec:
           securityContext:
             capabilities:
               add: ["NET_ADMIN", "NET_RAW"]
+          command: ["/usr/local/bin/multicast-relay"]   # <-- add this
           args:
             - "-i"
-            - "eth0"              # LAN interface (change if your NIC isn't eth0)
+            - "eth0"              # change if your LAN NIC isn't eth0
             - "-i"
             - "cni0"              # k3s pod network
             - "-g"
