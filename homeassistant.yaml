@@ -100,7 +100,8 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-    - port: 8123
+    - name: http
+      port: 8123
       targetPort: 8123
       protocol: TCP
     - name: mdns
