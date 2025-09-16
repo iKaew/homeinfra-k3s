@@ -24,8 +24,12 @@ spec:
             capabilities:
               add: ["NET_ADMIN", "NET_RAW"]
           args:
-            - "-i" ; - "eth0"           # LAN interface (check with: ip -br link)
-            - "-i" ; - "cni0"           # pod network
-            - "-g" ; - "224.0.0.251"    # mDNS
-            - "-g" ; - "239.255.255.250" # SSDP
+            - "-i"
+            - "eth0"              # LAN interface (adjust if not eth0)
+            - "-i"
+            - "cni0"              # pod network
+            - "-g"
+            - "224.0.0.251"       # mDNS
+            - "-g"
+            - "239.255.255.250"   # SSDP
       restartPolicy: Always
