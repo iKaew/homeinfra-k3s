@@ -103,5 +103,13 @@ spec:
     - port: 8123
       targetPort: 8123
       protocol: TCP
+    - name: mdns
+      port: 5353
+      targetPort: 5353
+      protocol: UDP
+    - name: ssdp
+      port: 1900
+      targetPort: 1900
+      protocol: UDP
   selector:
     app: homeassistant
