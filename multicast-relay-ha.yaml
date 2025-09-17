@@ -23,14 +23,10 @@ spec:
           securityContext:
             capabilities:
               add: ["NET_ADMIN", "NET_RAW"]
-          command: ["/usr/local/bin/multicast-relay"]   # <-- add this
-          args:
-            - "-i"
-            - "eth0"              # change if your LAN NIC isn't eth0
-            - "-i"
-            - "cni0"              # k3s pod network
-            - "-g"
-            - "224.0.0.251"       # mDNS
-            - "-g"
-            - "239.255.255.250"   # SSDP
+          command: ["/start.sh"]     # <-- use the image's wrapper script
+          env:
+            - name: INTERFACES
+              value: "eth0 cni0"     # LAN + pod network
+            - name: OPTS
+              value: "--verbose"     # optional; drop or tweak as you like
       restartPolicy: Always
