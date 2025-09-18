@@ -1,0 +1,129 @@
+apiVersion: v1
+kind: Namespace
+metadata: { name: pdfmd }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app
+  namespace: pdfmd
+data:
+  app.py: |
+    from fastapi import FastAPI, UploadFile, File, Form, Header, HTTPException
+    from fastapi.responses import JSONResponse, PlainTextResponse
+    from io import BytesIO
+    from markitdown import MarkItDown
+    import os, tempfile, subprocess
+
+    API_KEY = os.getenv("API_KEY")  # optional
+
+    app = FastAPI(title="PDF→Markdown", version="1.0")
+
+    def decrypt_if_needed(data: bytes, password: str | None) -> bytes:
+      if not password:
+        return data
+      # Try pikepdf (qpdf bindings) first
+      try:
+        import pikepdf
+        with pikepdf.open(BytesIO(data), password=password) as pdf:
+          out = BytesIO(); pdf.save(out); return out.getvalue()
+      except Exception:
+        # Fallback to qpdf CLI for odd edge cases
+        with tempfile.TemporaryDirectory() as td:
+          enc, dec = os.path.join(td,"in.pdf"), os.path.join(td,"out.pdf")
+          open(enc,"wb").write(data)
+          r = subprocess.run(["qpdf", f"--password={password}", "--decrypt", enc, dec],
+                             capture_output=True, text=True)
+          if r.returncode != 0:
+            raise HTTPException(status_code=400, detail=f"qpdf: {r.stderr.strip() or 'decrypt failed'}")
+          return open(dec,"rb").read()
+
+    @app.get("/healthz")
+    def healthz(): return {"ok": True}
+
+    @app.post("/convert")
+    async def convert(
+      file: UploadFile = File(...),
+      password: str | None = Form(None),
+      x_api_key: str | None = Header(None)
+    ):
+      if API_KEY and x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="invalid api key")
+      raw = await file.read()
+      clear = decrypt_if_needed(raw, password)
+      md = MarkItDown()
+      res = md.convert(clear, filename=file.filename or "upload.pdf")
+      return JSONResponse({"markdown": res.text_content})
+
+    @app.post("/convert/raw")
+    async def convert_raw(
+      file: UploadFile = File(...),
+      password: str | None = Form(None),
+      x_api_key: str | None = Header(None)
+    ):
+      if API_KEY and x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="invalid api key")
+      raw = await file.read()
+      clear = decrypt_if_needed(raw, password)
+      md = MarkItDown()
+      res = md.convert(clear, filename=file.filename or "upload.pdf")
+      return PlainTextResponse(res.text_content)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pdfmd
+  namespace: pdfmd
+  labels: { app: pdfmd }
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: pdfmd } }
+  template:
+    metadata: { labels: { app: pdfmd } }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: api
+          image: python:3.11-slim
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pdfmd-secrets
+                  key: apiKey
+          command: ["/bin/sh","-lc"]
+          args:
+            - |
+              set -e
+              apt-get update && apt-get install -y --no-install-recommends qpdf && rm -rf /var/lib/apt/lists/* && \
+              pip install --no-cache-dir fastapi uvicorn[standard] "markitdown[all]" pikepdf && \
+              uvicorn app:app --host 0.0.0.0 --port 8080
+          ports: [{ name: http, containerPort: 8080 }]
+          readinessProbe: { httpGet: { path: /healthz, port: 8080 }, initialDelaySeconds: 6, periodSeconds: 10 }
+          livenessProbe:  { httpGet: { path: /healthz, port: 8080 }, initialDelaySeconds: 12, periodSeconds: 20 }
+          resources:
+            requests: { cpu: "100m", memory: "256Mi" }
+            limits:   { cpu: "500m", memory: "1Gi" }
+          volumeMounts:
+            - { name: code, mountPath: /app }
+      volumes:
+        - name: code
+          configMap:
+            name: app
+            items: [{ key: app.py, path: app.py }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pdfmd
+  namespace: pdfmd
+spec:
+  type: LoadBalancer        # use MetalLB IP, or change to ClusterIP and use in-cluster DNS
+  selector: { app: pdfmd }
+  ports:
+    - { name: http, port: 8080, targetPort: 8080, protocol: TCP }
