@@ -81,10 +81,10 @@ spec:
   template:
     metadata: { labels: { app: pdfmd } }
     spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
+      #securityContext:
+      #  runAsNonRoot: true
+      #  runAsUser: 1000
+      #  runAsGroup: 1000
       containers:
         - name: api
           image: python:3.11-slim
