@@ -17,18 +17,18 @@ data:
 
     API_KEY = os.getenv("API_KEY")  # optional
 
-    app = FastAPI(title="PDF→Markdown", version="1.0")
+    app = FastAPI(title="PDF→Markdown", version="1.1")
 
     def decrypt_if_needed(data: bytes, password: str | None) -> bytes:
       if not password:
         return data
-      # Try pikepdf (qpdf bindings) first
+      # Try pikepdf first
       try:
         import pikepdf
         with pikepdf.open(BytesIO(data), password=password) as pdf:
           out = BytesIO(); pdf.save(out); return out.getvalue()
       except Exception:
-        # Fallback to qpdf CLI for odd edge cases
+        # fallback to qpdf CLI
         with tempfile.TemporaryDirectory() as td:
           enc, dec = os.path.join(td,"in.pdf"), os.path.join(td,"out.pdf")
           open(enc,"wb").write(data)
@@ -81,46 +81,52 @@ spec:
   template:
     metadata: { labels: { app: pdfmd } }
     spec:
-      #securityContext:
-      #  runAsNonRoot: true
-      #  runAsUser: 1000
-      #  runAsGroup: 1000
+      # run as root so apt-get works (no Dockerfile)
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
       containers:
         - name: api
-          image: python:3.11-slim
+          image: tiangolo/uvicorn-gunicorn-fastapi:python3.11-slim
           imagePullPolicy: IfNotPresent
           workingDir: /app
+          command: ["/bin/sh","-lc"]
+          args:
+            - |
+              set -e
+              echo "Installing system deps (qpdf)..."
+              apt-get update && apt-get install -y --no-install-recommends qpdf && rm -rf /var/lib/apt/lists/* ;
+              echo "Installing python deps..."
+              pip install --no-cache-dir "markitdown[all]" pikepdf ;
+              echo "Starting API..."
+              exec /start-reload.sh
           env:
+            - name: MODULE_NAME
+              value: app
+            - name: VARIABLE_NAME
+              value: app
+            - name: PORT
+              value: "8080"
+            - name: WEB_CONCURRENCY
+              value: "1"
             - name: API_KEY
               valueFrom:
                 secretKeyRef:
                   name: pdfmd-secrets
                   key: apiKey
-          command: ["/bin/sh","-lc"]
-          args:
-            - |
-              set -e
-              apt-get update && apt-get install -y --no-install-recommends qpdf && rm -rf /var/lib/apt/lists/* && \
-              pip install --no-cache-dir fastapi uvicorn[standard] "markitdown[all]" pikepdf && \
-              uvicorn app:app --host 0.0.0.0 --port 8080
           ports: [{ name: http, containerPort: 8080 }]
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 180   # wait a full minute before first check
-            periodSeconds: 20
-            timeoutSeconds: 3
-            failureThreshold: 5       # allow ~100s of failures before killing pod
           readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 40   # readiness can start sooner
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 120
             periodSeconds: 10
             timeoutSeconds: 3
-            failureThreshold: 3
-
+            failureThreshold: 6
+          livenessProbe:
+            httpGet: { path: /healthz, port: 8080 }
+            initialDelaySeconds: 300   # allow time for first-time installs on Pi
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5
           resources:
             requests: { cpu: "100m", memory: "256Mi" }
             limits:   { cpu: "500m", memory: "1Gi" }
@@ -138,7 +144,7 @@ metadata:
   name: pdfmd
   namespace: pdfmd
 spec:
-  type: LoadBalancer        # use MetalLB IP, or change to ClusterIP and use in-cluster DNS
+  type: LoadBalancer
   selector: { app: pdfmd }
   ports:
     - { name: http, port: 8080, targetPort: 8080, protocol: TCP }
