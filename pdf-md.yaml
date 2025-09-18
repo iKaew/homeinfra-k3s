@@ -105,21 +105,21 @@ spec:
               uvicorn app:app --host 0.0.0.0 --port 8080
           ports: [{ name: http, containerPort: 8080 }]
           livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 180   # wait a full minute before first check
-          periodSeconds: 20
-          timeoutSeconds: 3
-          failureThreshold: 5       # allow ~100s of failures before killing pod
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 40   # readiness can start sooner
-          periodSeconds: 10
-          timeoutSeconds: 3
-          failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 180   # wait a full minute before first check
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 5       # allow ~100s of failures before killing pod
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 40   # readiness can start sooner
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
 
           resources:
             requests: { cpu: "100m", memory: "256Mi" }
